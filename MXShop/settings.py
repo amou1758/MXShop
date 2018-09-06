@@ -29,6 +29,8 @@ SECRET_KEY = '*&o8=x5n)lhd==bzs6bo$bw5ihbg1(2qj5badp^^foywj93&xi'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+# 将User表中的字段替换掉系统中的用户
+AUTH_USER_MODEL = 'user.UserProfile'
 
 
 # Application definition
