@@ -1,6 +1,6 @@
 #Django-REST-Framework 的应用
 
-
+### 1. 项目初始化
 
 #### requirements.txt 文件用于记录项目所使用的 第三方包
 
@@ -17,7 +17,9 @@ setuptools          40.2.0
 wheel               0.31.1
 ```
 
-### user model 设计:
+
+
+### 2. user model 设计:
 
 ```python
 # user.models.py
@@ -77,7 +79,7 @@ AUTH_USER_MODEL = 'user.UserProfile'
 
 
 
-### goods models 设计:
+### 3. goods models 设计:
 
 ```python
 from datetime import datetime
@@ -99,7 +101,7 @@ class GoodsCategory(models.Model):
     code = models.CharField(default='', max_length=20, verbose_name='类别code', help_text='类别code')
     desc = models.CharField(default='', max_length=20, verbose_name='类别描述', help_text='类别描述')
     category_type = models.IntegerField(choices=CATEGORY_TYPE, verbose_name='类别级别', help_text='类别级别')
-    category_image = models.CharField("self", null=True, blank=True,  max_length=20, verbose_name='父类级别', related_name='sub_cat')
+    category_category = models.ForeignKey("self", null=True, blank=True,  max_length=20, verbose_name='父类级别', related_name='sub_cat')
     # 自关联, 自己指向自己的表
     is_tab = models.BooleanField(default=False, verbose_name='是否导航', help_text='是否导航')
     add_time = models.DateTimeField(default=datetime.now, verbose_name='添加时间')
@@ -118,7 +120,7 @@ class GoodsCategoryBrand(models.Model):
     """
     name = models.CharField(default="", max_length=30, verbose_name='品牌名', help_text='品牌名')
     desc = models.TextField(default="", max_length=200, verbose_name='品牌描述', help_text='品牌描述')
-    image = models.ImageField(upload_to='brand/images/', verbose_name='上传图片')
+    image = models.ImageField(max_length=200, upload_to='brand/images/', verbose_name='上传图片')
     add_time = models.DateTimeField(default=datetime.now, verbose_name='添加时间')
     
     def __str__(self):
@@ -198,7 +200,7 @@ class Banner(models.Model):
 
 
 
-### Trade Models 设计:
+### 4. Trade Models 设计:
 
 ```python
 from datetime import datetime
@@ -208,6 +210,7 @@ from django.contrib.auth import get_user_model
 # 获取 UserApp中的Model, 推荐使用这种软编码形式
 from goods.models import Goods
 User = get_user_model()
+
 
 class ShoppingCart(models.Model):
     """
@@ -240,7 +243,7 @@ class OrderInfo(models.Model):
     order_sn = models.CharField(max_length=30, verbose_name='订单编号')
     trade_no = models.CharField(max_length=100, unique=True, null=True, blank=True, verbose_name='支付宝订单号')
     # 第三方支付: 支付宝支付的订单号与我们的商品的订单号做一个关联
-    pay_status = models.CharField(choices=ORDER_STATUS, verbose_name='支付状态')
+    pay_status = models.CharField(max_length=20, choices=ORDER_STATUS, verbose_name='支付状态')
     post_script = models.CharField(max_length=200, verbose_name='订单留言')
     order_mount = models.FloatField(verbose_name='订单金额')
     pay_time = models.DateTimeField(null=True, blank=True, default=datetime.now, verbose_name='支付时间')
@@ -248,7 +251,7 @@ class OrderInfo(models.Model):
     # 用户中心
     address = models.CharField(max_length=200, verbose_name='签收地址')
     signer_name = models.CharField(max_length=20, verbose_name='签收人')
-    signer_mobile = models.CharField(verbose_name='签收电话')
+    signer_mobile = models.CharField(max_length=11, verbose_name='签收电话')
     
     add_time = models.DateTimeField(default=datetime.now, verbose_name='添加时间')
     
@@ -277,12 +280,12 @@ class OrderGoods(models.Model):
     class Meta:
         verbose_name = '订单商品'
         verbose_name_plural = verbose_name
-    
+
 ```
 
 
 
-#### get_user_model() 获取用户模型
+#### 5. get_user_model() 获取用户模型
 
 **下面为 get_user_model() 函数的源码, 当然–> 如果想用该函数获取项目中的用户模型  需要在 settings 中配置用户模型的路径, 以便我们 django  能够找到**
 
@@ -387,4 +390,10 @@ class UserAddress(models.Model):
         verbose_name = '收获地址'
         verbose_name_plural = verbose_name
 ```
+
+
+
+### 6. migrations 原理及表的生成:
+
+**[传送门](https://www.bilibili.com/video/av30195311/?p=13)**
 

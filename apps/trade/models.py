@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from goods.models import Goods
 User = get_user_model()
 
+
 class ShoppingCart(models.Model):
     """
     购物车:
@@ -37,7 +38,7 @@ class OrderInfo(models.Model):
     order_sn = models.CharField(max_length=30, verbose_name='订单编号')
     trade_no = models.CharField(max_length=100, unique=True, null=True, blank=True, verbose_name='支付宝订单号')
     # 第三方支付: 支付宝支付的订单号与我们的商品的订单号做一个关联
-    pay_status = models.CharField(choices=ORDER_STATUS, verbose_name='支付状态')
+    pay_status = models.CharField(max_length=20, choices=ORDER_STATUS, verbose_name='支付状态')
     post_script = models.CharField(max_length=200, verbose_name='订单留言')
     order_mount = models.FloatField(verbose_name='订单金额')
     pay_time = models.DateTimeField(null=True, blank=True, default=datetime.now, verbose_name='支付时间')
@@ -45,7 +46,7 @@ class OrderInfo(models.Model):
     # 用户中心
     address = models.CharField(max_length=200, verbose_name='签收地址')
     signer_name = models.CharField(max_length=20, verbose_name='签收人')
-    signer_mobile = models.CharField(verbose_name='签收电话')
+    signer_mobile = models.CharField(max_length=11, verbose_name='签收电话')
     
     add_time = models.DateTimeField(default=datetime.now, verbose_name='添加时间')
     
