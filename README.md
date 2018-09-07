@@ -946,3 +946,22 @@ Hypermedia API的设计被称为[HATEOAS](http://en.wikipedia.org/wiki/HATEOAS)�
 （2）服务器返回的数据格式，应该尽量使用JSON，避免使用XML。
 
 （完）
+
+
+
+
+
+### 2. vue 的基本概念介绍 [传送门](https://www.bilibili.com/video/av30195311/?p=18)
+
+1. 前端工程化
+2. 数据双向绑定
+3. 组件化开发
+
+**vue 开发的几个概念:**
+
+1. webpack, 将所有的东西变成 js 文件(web动态显示)
+2. vue, vuex(组件间通信), vue-router(路径与组件进行关联), axios(在 vue中替代 ajax)
+   1. mvvm: 不推荐 js 操作 DOM书,  axios代替 jquery 包 提高执行效率
+3. ES6, babel
+   1. babel:转化器, 将ES6语法转换成ES5语法
+
