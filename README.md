@@ -468,3 +468,67 @@ class UserConfig(AppConfig):
 # 在 App 的 apps.py 的文件中添加 verbose_name 的字段即可
 ```
 
+
+
+### 8. 利用 Django models 将数据导入:
+
+- 先获取当前脚本的路径
+
+- 在获取项目的目录
+
+- 导入 项目settings.py (导入项目的配置文件)
+
+- 初始化 Django
+
+- 导入 models 中的模型类
+
+- 进行插入数据
+
+- ```python
+  
+  # 独立使用 django-model
+  import os
+  import sys
+  
+  # 获取当前脚本的路径
+  pwd = os.path.dirname(os.path.realpath(__file__))
+  # 获取项目的根目录
+  sys.path.append(pwd+"../")
+  # 找到项目 setting 文件, 获取setting中的配置, 初始化Django
+  os.environ.setdefault("DJANGO_SETTINGS_MODULE", "MXShop.settings")
+  
+  import django
+  django.setup()
+  
+  # 先初始化 Django  在导入项目的中的模型
+  # 导入models模型
+  from goods.models import GoodsCategory
+  
+  # 数据存储的位置
+  from db_tools.data.category_data import row_data
+  
+  
+  # 入库
+  for lev1_cat in row_data:
+      lev1_intance = GoodsCategory()
+      lev1_intance.code = lev1_cat["code"]
+      lev1_intance.name = lev1_cat["name"]
+      lev1_intance.category_type = 1
+      lev1_intance.save()
+      
+      for lev2_cat in lev1_cat['sub_categorys']:
+          lev2_intance = GoodsCategory()
+          lev2_intance.code = lev2_cat["code"]
+          lev2_intance.name = lev2_cat["name"]
+          lev2_intance.category_type = 2
+          lev2_intance.parent_category = lev1_intance
+          lev2_intance.save()
+          
+          for lev3_cat in lev2_cat['sub_categorys']:
+              lev3_intance = GoodsCategory()
+              lev3_intance.code = lev3_cat["code"]
+              lev3_intance.name = lev3_cat["name"]
+              lev3_intance.category_type = 3
+              lev3_intance.parent_category = lev2_intance
+              lev3_intance.save()
+  ```
