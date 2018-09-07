@@ -965,3 +965,52 @@ Hypermedia API的设计被称为[HATEOAS](http://en.wikipedia.org/wiki/HATEOAS)�
 3. ES6, babel
    1. babel:转化器, 将ES6语法转换成ES5语法
 
+
+
+## 第三章:
+
+### django 的 view 实现商品列表页:
+
+```python
+# cbv  --> class base view 面相对象的编程方式
+```
+
+**Django–ListView**
+
+```
+from django.views.generic.base import View
+# 导入 django 中的 view
+```
+
+**自己编写 djangolistview 来返回商品列表页数据:**
+
+```python
+# Django 中的 ListView
+from django.views.generic.base import View
+from django.views.generic import ListView
+
+from goods.models import Goods
+
+
+class GoodsListView(View):
+    def get(self, request):
+        """
+        通过 django 的 view 实现商品列表页
+        :param request:
+        :return:json.dumps(xxx)
+        """
+        json_list = []
+        goods = Goods.objects.all()[:10]
+        for good in goods:
+            json_dict = {}
+            json_dict['name'] = good.name
+            json_dict['category'] = good.category.name
+            json_dict['market_price'] = good.market_price
+            json_list.append(json_dict)
+        print(json_list)
+        from django.http import HttpResponse
+        import json
+        return HttpResponse(json.dumps(json_list), content_type='application/json')
+
+```
+
