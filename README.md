@@ -376,7 +376,7 @@ class UserAddress(models.Model):
     用户收获地址:
     """
     user = models.ForeignKey(User, verbose_name='用户')
-    district = models.CharField(max_length=100, default='', verbose_name='区域')
+    district = models.CharField(max_length=100, default='', verbose_name='区域') 
     address = models.CharField(max_length=100, default='', verbose_name='详细地址')
     signer_name = models.CharField(max_length=10, default='', verbose_name='签收人')
     signer_mobile = models.CharField(max_length=11, default='', verbose_name='签收电话')
@@ -396,4 +396,75 @@ class UserAddress(models.Model):
 ### 6. migrations 原理及表的生成:
 
 **[传送门](https://www.bilibili.com/video/av30195311/?p=13)**
+
+
+
+### 7. Xadmin 后台管理的配置.
+
+官方的 xadmin 对于 python36 会有bug
+
+用项目的 xadmin 代替官方的
+
+#### 1. github 搜索xadmin 查看官方的依赖包
+
+- 依赖包在 requirements.txt 内记录.
+
+![1536315472210](C:\Users\Administrator\AppData\Local\Temp\1536315472210.png)
+
+**requiretments.txt 文件记录如下:**
+
+```python
+django>=1.9.0
+django-crispy-forms>=1.6.0
+django-import-export>=0.5.1
+django-reversion>=2.0.0
+django-formtools==1.0
+future==0.15.2
+httplib2==0.9.2
+six==1.10.0
+```
+
+除了django, 其他依赖包都要安装, 依赖包直接用最新版本的就可以
+
+**安装好之后  依赖包信息如下:**
+
+```python
+Successfully installed 
+diff-match-patch-20121119 
+django-crispy-forms-1.7.2 
+django-formtools-2.1 
+django-import-export-1.0.1 
+django-reversion-3.0.0 
+et-xmlfile-1.0.1
+future-0.16.0 httpl
+ib2-0.11.3 
+jdcal-1.4 
+odfpy-1.3.6 
+openpyxl-2.5.6 
+pyyaml-3.13 
+six-1.11.0 
+tablib-0.12.1
+unicodecsv-0.14.1 
+xlrd-1.1.0 
+xlwt-1.3.0
+
+```
+
+#### 还要安装 xls, xlsx 导出文件依赖包
+
+![1536316011774](C:\Users\Administrator\AppData\Local\Temp\1536316011774.png)这两个依赖包是用于导出 excel 文件的
+
+
+
+#### 在后台修改 App 的现实名称:
+
+```PYTHON
+from django.apps import AppConfig
+
+
+class UserConfig(AppConfig):
+    name = 'apps.user'
+    verbose_name = '用户管理'
+# 在 App 的 apps.py 的文件中添加 verbose_name 的字段即可
+```
 
