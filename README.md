@@ -532,3 +532,89 @@ class UserConfig(AppConfig):
               lev3_intance.parent_category = lev2_intance
               lev3_intance.save()
   ```
+
+
+
+### 9. 导入商品和商品类别数据(Django-Admin)
+
+#### 导入数据思路和操作 与 第八章相同
+
+```python
+
+# 独立使用 django-model
+import os
+import sys
+
+# 获取当前脚本的路径
+pwd = os.path.dirname(os.path.realpath(__file__))
+# 获取项目的根目录
+sys.path.append(pwd+"../")
+# 找到项目 setting 文件, 获取setting中的配置, 初始化Django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "MXShop.settings")
+
+import django
+django.setup()
+
+# 先初始化 Django  在导入项目的中的模型
+# 导入models模型
+from goods.models import Goods, GoodsCategory, GoodsImage
+# 导入数据
+from db_tools.data.product_data import row_data
+
+
+for goods_detail in row_data:
+    goods = Goods()
+    goods.name = goods_detail['name']
+    goods.market_price = float(int(goods_detail["market_price"].replace("￥", "").replace("元", "")))
+    goods.shop_price = float(int(goods_detail["sale_price"].replace("￥", "").replace("元", "")))
+    goods.goods_brief = goods_detail['desc'] if goods_detail['desc'] is not None else ""
+    goods.goods_desc = goods_detail['goods_desc'] if goods_detail['goods_desc'] is not None else ""
+    goods.goods_front_image = goods_detail['images'][0] if goods_detail['images'] is not None else ""
+    category_name = goods_detail['categorys'][-1]
+    
+    category = GoodsCategory.objects.filter(name=category_name)
+    if category:
+        goods.category = category[0]
+        
+    goods.save()
+    
+    for goods_image in goods_detail['images']:
+        goods_image_instance = GoodsImage()
+        goods_image_instance.image = goods_image
+        goods_image_instance.goods = goods
+        goods_image_instance.save()
+        
+```
+
+#### 导入数据完毕后:
+
+数据库内部存储的图片实际上是图片存储的路径, 我们的图片等静态资源存放在 media 文件夹内部, 
+
+#### 配置 Media:
+
+##### 配置 settings.py 文件
+
+```python
+
+# 如果不设置此项配置, Django无法找到我们存放的图片
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+```
+
+##### 配置 urls.py 文件
+
+也就是外部访问我们服务器内部的图片资源的 url 
+
+```python
+# 设计静态文件的访问url
+from MXShop.settings import MEDIA_ROOT
+from django.views.static import serve
+urlpatterns = [
+    url(r'^xadmin/', xadmin.site.urls),
+    url(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
+]
+```
+
+#### 跟 后台富文本编辑器的配置相似
+

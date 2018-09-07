@@ -84,7 +84,7 @@ class GoodsImage(models.Model):
     """
     goods = models.ForeignKey(Goods, verbose_name='商品', related_name="images")
     image = models.ImageField(upload_to='', verbose_name='图片', null=True, blank=True)
-    image_url = models.CharField(max_length=300, null=True, blank=True, verbose_name='图片url')
+    # image_url = models.CharField(max_length=300, null=True, blank=True, verbose_name='图片url')
     
     add_time = models.DateTimeField(default=datetime.now, verbose_name='添加时间')
     
