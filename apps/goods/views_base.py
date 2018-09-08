@@ -13,9 +13,9 @@ class GoodsListView(View):
         goods = Goods.objects.all()[:10]
         import json
         from django.core import serializers
-        # django 为我们提供的方法, 专门做序列化的
         json_data = serializers.serialize('json', goods)
         json_data = json.loads(json_data)
         from django.http import JsonResponse
         return JsonResponse(json_data, safe=False)
+
 

@@ -1,5 +1,44 @@
 #Django-REST-Framework 的应用
 
+## DRF
+
+#### DRF: 一个强大的web API
+
+- **Django REST FrameWork中文文档目录：**
+
+  [Django REST FrameWork 中文教程1:序列化](http://www.chenxm.cc/post/289.html)
+
+  [Django REST FrameWork 中文教程2:请求和响应](http://www.chenxm.cc/post/290.html)
+
+  [Django REST FrameWork 中文教程3:基于类的视图](http://www.chenxm.cc/post/291.html)
+
+  [Django REST FrameWork 中文教程4：验证和权限](http://www.chenxm.cc/post/292.html)
+
+  [Django REST FrameWork 中文教程5：关系和超链接API](http://www.chenxm.cc/post/293.html)
+
+  [Django REST FrameWork 中文教程6: ViewSets＆Routers](http://www.chenxm.cc/post/294.html)
+
+  [Django REST FrameWork 中文教程7：模式和客户端库](http://www.chenxm.cc/post/295.html)
+
+DRF: 支持的版本:
+
+REST framework requires the following:
+
+- Python (2.7, 3.2, 3.3, 3.4, 3.5, 3.6)
+- Django (1.10, 1.11, 2.0)
+
+The following packages are optional:
+
+- [coreapi](https://pypi.org/project/coreapi/) (1.32.0+) - Schema generation support.
+- [Markdown](https://pypi.org/project/Markdown/) (2.1.0+) - Markdown support for the browsable API.
+- [django-filter](https://pypi.org/project/django-filter/) (1.0.1+) - Filtering support.
+- [django-crispy-forms](https://github.com/maraujop/django-crispy-forms) - Improved HTML display for filtering.
+- [django-guardian](https://github.com/django-guardian/django-guardian) (1.1.1+) - Object level permissions support.
+
+
+
+## 第一章: 项目初始化配置
+
 ### 1. 项目初始化
 
 #### requirements.txt 文件用于记录项目所使用的 第三方包
@@ -620,7 +659,7 @@ urlpatterns = [
 
 
 
-## 第二章:
+## 第二章: RESTful 简单介绍:
 
 ### 1. restful 和 前端源码结构介绍 [传送门](https://www.bilibili.com/video/av30195311/?p=17)
 
@@ -967,7 +1006,7 @@ Hypermedia API的设计被称为[HATEOAS](http://en.wikipedia.org/wiki/HATEOAS)�
 
 
 
-## 第三章:
+## 第三章: 商品列表页
 
 ### django 的 view 实现商品列表页:
 
@@ -987,10 +1026,11 @@ from django.views.generic.base import View
 ```python
 # Django 中的 ListView
 from django.views.generic.base import View
+# View, ListView 是 Django 为我们提供的 类视图函数, 相同的类视图函数还有很多
 from django.views.generic import ListView
 
 from goods.models import Goods
-
+# 导入我们的视图
 
 class GoodsListView(View):
     def get(self, request):
@@ -1011,12 +1051,36 @@ class GoodsListView(View):
         from django.http import HttpResponse
         import json
         return HttpResponse(json.dumps(json_list), content_type='application/json')
+    # 需要指定返回数据的格式: content_type='application/json'
+    # json.dumps() 将数据 json 序列化
 
+```
+
+**json 不能对 datetime 数据进行序列化**
+
+#### **model_to_dict() 对象转字典函数:**
+
+```python
+        json_list = []
+        goods = Goods.objects.all()[:10]
+        # 只取结果集中的前十条数据
+        for good in goods:
+            json_dict = {}
+            json_dict['name'] = good.name
+            json_dict['category'] = good.category.name
+            json_dict['market_price'] = good.market_price
+            json_dict['add_time'] = good.add_time
+            json_list.append(json_dict)
+        ## 上下两者等效  
+        from django.forms.models import model_to_dict
+        for good in goods:
+            json_dict = model_to_dict(good)
+            json_list.append(json_dict)
 ```
 
 
 
-### 2. Django 的 serializer 序列化 model
+### 2. Django 的 serializer 序列化 model [传送门](https://www.bilibili.com/video/av30195311/?p=21)
 
 使用 Django 的 serializer 
 
@@ -1034,10 +1098,254 @@ class GoodsListView(View):
         goods = Goods.objects.all()[:10]
         import json
         from django.core import serializers
-        # django 为我们提供的方法, 专门做序列化的
+        # django 为我们提供的 serializers方法, 专门做序列化的
         json_data = serializers.serialize('json', goods)
+        # 将 goods 对象 按照 json 格式进行序列化
         json_data = json.loads(json_data)
+        # 将数据进行解码, 将 json 数据变成 py 的 dict 对象
         from django.http import JsonResponse
+        # JsonResponse 以 json 形式返回, safe=False 告诉django不要转义
         return JsonResponse(json_data, safe=False)
 ```
 
+#### serializers将我们的数据进行序列化 
+
+`serializers.py`
+
+```python
+from rest_framework import serializers
+from rest_framework.response import Response
+# Response 是 DRF 为我们封装的相应函数(在DJango的Response的基础上做了封装)
+from rest_framework import status
+
+from goods.models import Goods, GoodsCategory
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GoodsCategory
+        fields = '__all__'
+
+
+class GoodsSerializer(serializers.ModelSerializer):
+    """
+    ModelSerializer: 会根据我们的模型类, 分析其类型, 然后做映射
+    """
+    category = CategorySerializer()
+    # 实例化 GoodsCategory 序列化之后的结果
+    class Meta:
+        model = Goods
+        # fields = ('name', 'click_num', 'market_price', 'add_time')
+        # fields 指定要序列换的字段, fields 中有个 '__all__' 属性, 表示所有字段全部序列化(变成字符串)
+        fields = '__all__'    
+```
+
+#### 取出序列化的数据进行响应
+
+`views.py`
+
+```python
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import GoodsSerializer
+
+from .models import Goods
+
+
+class GoodsListView(APIView):
+    """
+    List all goods
+    """
+
+    def get(self, request, format=None):
+        goods = Goods.objects.all()[:10]
+        goods_serializer = GoodsSerializer(goods, many=True)
+        return Response(goods_serializer.data)
+```
+
+
+
+### 3. ApiView 方式实现商品列表页: [传送门](https://www.bilibili.com/video/av30195311/?p=22)
+
+
+
+#### 在项目的 urls.py 中配置 DRF 的登陆 url
+
+```python
+ url(r'^api-auth/', include('rest_framework.urls')),
+```
+
+
+
+![1536354074457](C:\Users\Administrator\AppData\Local\Temp\1536354074457.png)![1536354098990](C:\Users\Administrator\AppData\Local\Temp\1536354098990.png)
+
+##### 主要的错误原因是: DRF 中可以登陆, 然而返回的是一个空的用户名  所以…
+
+在 models 中定义的 user 表 中返回的 name 字段可以为空
+
+```python
+
+class UserProfile(AbstractUser):
+    """
+    用户:
+    AbstractUser: UserProfile并没有替换掉我们系统的拥护
+    如果想要替换需要settings中设置
+    """
+    name = models.CharField(max_length=20, null=True, blank=True, verbose_name='姓名')
+    birthday = models.DateField(null=True, blank=True, verbose_name='出生日期')
+    gender = models.CharField(max_length=6, choices=(("male", "男"), ("female", '女')), default='男', verbose_name='性别')
+    mobile = models.CharField(max_length=11, verbose_name='电话')
+    email = models.CharField(max_length=100, null=True, blank=True,  verbose_name='邮箱')
+    
+    # null=Ture: 数据库可以为空, blank=True 可以为空
+    class Meta:
+        verbose_name = '用户'
+        verbose_name_plural = '用户'
+        
+    def __str__(self):
+        return self.name
+    
+    def __str__(self):
+        return self.username
+    # 将 self.name 字段 改为 username
+    
+```
+
+
+
+### 4. DRF 的 modelsserializer 实现商品列表页功能
+
+####  取出 前端传递过来的 post 的数据, 进行操作:
+
+`serializers.py`
+
+```python
+from rest_framework import serializers
+from goods.models import Goods
+
+
+class GoodsSerializer(serializers.Serializer):
+    name = serializers.CharField(required=True, max_length=100)
+    click_num = serializers.IntegerField(default=0)
+    goods_front_image = serializers.ImageField()
+
+    def create(self, validated_date):
+        """
+        重载 create 函数
+
+        """
+        # validated_date 会将 GoodsSerializer 的字段全部放到 dict 内
+        return Goods.objects.create(**validated_date)
+
+```
+
+`views.py`
+
+```python
+    def post(self, request):
+        """
+        request: DRF 为我们封装的
+        :param request:
+        """
+        serializer = GoodsSerializer(data=request.data)
+        # request.data: DRF 将 post 的数据取出来
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.errors, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # status: Django 为我们提供的 HTTP 常用状态码
+```
+
+#### ModelSerializer 模型序列化
+
+`serializers.py`
+
+```python
+from rest_framework import serializers
+from goods.models import Goods
+
+
+class GoodsSerializer(serializers.ModelSerializer):
+    # ModelSerializer 将我们的模型(model)数据进行序列化
+    class Meta:
+        model = Goods
+        # 指定我们的模型
+        fields = ('name', 'click_num', 'market_price', 'add_time')
+        # 指定我们的字段
+        # fields 有一个 __all__ 属性表明: 模型中的所有字段全部序列化
+        # fields = '__all__'
+        
+```
+
+`views.py`
+
+```python
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import GoodsSerializer
+
+from .models import Goods
+
+
+class GoodsListView(APIView):
+    """
+    List all goods
+    """
+
+    def get(self, request, format=None):
+        goods = Goods.objects.all()[:10]
+        goods_serializer = GoodsSerializer(goods, many=True)
+        return Response(goods_serializer.data)
+```
+
+ModelSerializer 模型序列化 使用外键
+
+`serializers.py`
+
+```python
+from rest_framework import serializers
+from goods.models import Goods, GoodsCategory
+
+
+class GoodsCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GoodsCategory
+        fields = "__all__"
+
+
+class GoodsSerializer(serializers.ModelSerializer):
+    category = GoodsCategorySerializer()
+    # 对GoodsCategorySerializer 进行实例化, 也就是说将我们的外键表, 进行序列化之后, 引入进来进行实例化之后, 就可以当作我们的外键使用了
+    
+    class Meta:
+        model = Goods
+        fields = '__all__'
+```
+
+`views.py`
+
+```python
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+from goods.models import Goods
+from .serializers import GoodsSerializer
+
+
+class GoodsListView(APIView):
+    """
+    List all goods
+    """
+
+    def get(self, request, format=None):
+        goods = Goods.objects.all()[:10]
+        goods_serializer = GoodsSerializer(goods, many=True)
+        return Response(goods_serializer.data)
+```
+
+**实现效果展示:**
+
+![1536446168475](C:\Users\Administrator\AppData\Local\Temp\1536446168475.png)
+
+### 5. GenericView 方式实现商品列表页和分页功能详解:
