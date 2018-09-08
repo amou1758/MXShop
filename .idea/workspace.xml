@@ -4,11 +4,8 @@
     <list default="true" id="c14a8b54-d16b-4deb-b781-b85e9e8d1897" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MXShop/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/MXShop/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MXShop/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/MXShop/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/goods/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/goods/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/goods/views_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/goods/views_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/user/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/user/models.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -38,25 +35,49 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/apps/goods/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
-              <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
+            <state relative-caret-position="160">
+              <caret line="9" column="17" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
               <folding>
-                <element signature="e#0#40#0" expanded="true" />
+                <element signature="e#0#35#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="serializers.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="settings.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MXShop/settings.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="431">
+              <caret line="153" column="3" lean-forward="true" selection-start-line="153" selection-start-column="3" selection-end-line="153" selection-end-column="3" />
+              <folding>
+                <element signature="e#310#319#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="serializers.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/apps/goods/serializers.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="320">
               <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
               <folding>
                 <element signature="e#0#38#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/apps/goods/models.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="68">
+              <caret line="54" column="12" selection-start-line="54" selection-start-column="4" selection-end-line="54" selection-end-column="12" />
+              <folding>
+                <element signature="e#0#29#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -101,12 +122,12 @@
         <option value="$PROJECT_DIR$/apps/goods/models.py" />
         <option value="$PROJECT_DIR$/db_tools/import_goods_data.py" />
         <option value="$PROJECT_DIR$/apps/goods/views.base.py" />
-        <option value="$PROJECT_DIR$/MXShop/settings.py" />
         <option value="$PROJECT_DIR$/apps/goods/serializer.py" />
         <option value="$PROJECT_DIR$/MXShop/urls.py" />
         <option value="$PROJECT_DIR$/apps/user/models.py" />
         <option value="$PROJECT_DIR$/apps/goods/views_base.py" />
         <option value="$PROJECT_DIR$/apps/goods/serializers.py" />
+        <option value="$PROJECT_DIR$/MXShop/settings.py" />
         <option value="$PROJECT_DIR$/apps/goods/views.py" />
       </list>
     </option>
@@ -122,8 +143,9 @@
   </component>
   <component name="ProjectFrameBounds" extendedState="1">
     <option name="x" value="861" />
+    <option name="y" value="3" />
     <option name="width" value="509" />
-    <option name="height" value="767" />
+    <option name="height" value="764" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="1" id="Add" />
@@ -293,7 +315,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="861" y="0" width="509" height="767" extended-state="0" />
+    <frame x="861" y="3" width="509" height="764" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -301,7 +323,7 @@
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.76694214" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.7660312" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.9293103" />
       <window_info content_ui="combo" id="Project" order="0" weight="0.83073497" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
@@ -357,7 +379,7 @@
         <state relative-caret-position="240">
           <caret line="15" column="28" selection-start-line="15" selection-start-column="28" selection-end-line="15" selection-end-column="28" />
           <folding>
-            <element signature="e#0#40#0" expanded="true" />
+            <element signature="e#0#35#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -565,26 +587,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/apps/goods/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="57" column="66" lean-forward="true" selection-start-line="56" selection-start-column="3" selection-end-line="57" selection-end-column="66" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MXShop/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="410">
-          <caret line="54" column="21" selection-start-line="54" selection-start-column="21" selection-end-line="54" selection-end-column="21" />
-          <folding>
-            <element signature="e#310#319#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../MX_ENV/Lib/site-packages/rest_framework/status.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-78" />
@@ -620,12 +622,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/apps/goods/views.py">
+    <entry file="file://$PROJECT_DIR$/apps/goods/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
+        <state relative-caret-position="68">
+          <caret line="54" column="12" selection-start-line="54" selection-start-column="4" selection-end-line="54" selection-end-column="12" />
           <folding>
-            <element signature="e#0#40#0" expanded="true" />
+            <element signature="e#0#29#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -636,6 +638,26 @@
           <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MXShop/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="431">
+          <caret line="153" column="3" lean-forward="true" selection-start-line="153" selection-start-column="3" selection-end-line="153" selection-end-column="3" />
+          <folding>
+            <element signature="e#310#319#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/goods/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="9" column="17" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
           </folding>
         </state>
       </provider>

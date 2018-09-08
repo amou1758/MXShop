@@ -1349,3 +1349,99 @@ class GoodsListView(APIView):
 ![1536446168475](C:\Users\Administrator\AppData\Local\Temp\1536446168475.png)
 
 ### 5. GenericView 方式实现商品列表页和分页功能详解:
+
+#### 使用 mixins.ListModelMixin generics.GenericAPIView
+
+`serializers.py` 同上
+
+`views.py`
+
+```python
+from rest_framework import mixins
+from rest_framework import generics
+
+from goods.models import Goods
+from .serializers import GoodsSerializer
+
+
+class GoodsListView(mixins.ListModelMixin,generics.GenericAPIView):
+    """
+    商品列表页
+    mixins.ListModelMixin
+    generics.GenericAPIView:
+
+    """
+    queryset = Goods.objects.all()[:10]
+    #　得到我们的模型
+    serializer_class = GoodsSerializer
+    # 得到 我们的 模型的 Serializer
+    
+    def get(self, request, *args, **kwargs):
+        # 如果我们不重载get 或者 post 的话, 他就会默认我们不接受 get 或者 post 的请求 ---> 可以使用ListView() 方法来解决这种问题
+        # 重载 get 函数
+        # get 函数 可以实现分页, 和 数据序列化
+        return self.list(request, *args, **kwargs)
+```
+
+**如果我们不重载get 或者 post 的话, 他就会默认我们不接受 get 或者 post 的请求 ---> 可以使用ListView() 方法来解决这种问题**
+
+#### **使用 ListView:**
+
+```python
+from rest_framework import generics
+
+from goods.models import Goods
+from .serializers import GoodsSerializer
+
+
+class GoodsListView(generics.ListAPIView):
+    """
+    商品列表页
+    """
+    queryset = Goods.objects.all()[:10]
+    serializer_class = GoodsSerializer
+```
+
+#### 使用分页:
+
+**追加到项目的 settings.py 中即可**
+
+```python
+# 所有关于 rest_framework 的配置都有设定在这里
+REST_FRAMEWORK = {
+    'PAGE_SIZE': 10,
+}
+```
+
+**实现效果:**
+
+![1536448406553](C:\Users\Administrator\AppData\Local\Temp\1536448406553.png)
+
+#### 定制 Pagination 分页功能
+
+**views.py**
+
+```python
+from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
+# 重构我们的 分页功能
+
+from goods.models import Goods
+from .serializers import GoodsSerializer
+
+
+class GoodsPagination(PageNumberPagination):
+    page_size = 40
+    page_size_query_param = 'page_size'
+    page_query_param = 'p'
+    max_page_size = 100
+
+class GoodsListView(generics.ListAPIView):
+    """
+    商品列表页
+    """
+    queryset = Goods.objects.all()
+    serializer_class = GoodsSerializer
+    pagination_class = GoodsPagination
+```
+

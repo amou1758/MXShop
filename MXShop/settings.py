@@ -146,3 +146,9 @@ STATIC_URL = '/static/'
 # 如果不设置此项配置, Django无法找到我们存放的图片
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# 所有关于 rest_framework 的配置都有设定在这里
+
+# REST_FRAMEWORK = {
+#     'PAGE_SIZE': 10,
+# }
