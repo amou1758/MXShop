@@ -2265,3 +2265,86 @@ http://127.0.0.1:8000/goods/1/
       CORS_ORIGIN_ALLOW_ALL = True
       # 设置所有主机皆可访问
       ```
+
+### 3.  vue 展示商品列表页数据: [传送门](https://www.bilibili.com/video/av30195311/?p=35)
+
+#### views.py 
+
+```python
+from rest_framework import generics, mixins
+from rest_framework.pagination import PageNumberPagination
+# 重构我们的 分页功能
+from rest_framework import viewsets
+from rest_framework import filters
+# 使用 DRF 的 filters
+from goods.models import Goods, GoodsCategory
+from django_filters.rest_framework import DjangoFilterBackend
+from .filter import GoodsFilter
+
+from .serializers import GoodsSerializer, CategorySerializer
+# 导入过滤器模块
+
+class GoodsPagination(PageNumberPagination):
+    page_size = 12
+    page_size_query_param = 'page_size'
+    page_query_param = 'page'
+    max_page_size = 100
+
+
+class GoodsListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    """
+    商品列表页, 分页, 搜索, 过滤, 排序
+    """
+    queryset = Goods.objects.all()
+    serializer_class = GoodsSerializer
+    pagination_class = GoodsPagination
+    # 指定过滤函数
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    # 指定 DRF 中的 SearchFilter, 进行字段的搜索
+    # 指定 DRF 中的 OrderingFilter 进行字段的排序
+    filter_class = GoodsFilter
+    search_fields = ('^name', 'goods_brief', 'goods_desc')
+    # 进行了三个字段的配置, 但是 ^ 表示, 必须存在 name 字段以你搜索的内容开头的
+    # = 表示精确搜索, 使用方法同上
+    ordering_fields = ('sold_num', 'shop_price')
+    # 指定排序的字段
+    
+    
+class CategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    """
+    list:
+        商品分类列表数据
+    """
+    # 只需要在类视图中继承 mixins.RetrieveModelMixin  就可以在url中根据pk 取出具体某个数据
+    queryset = GoodsCategory.objects.filter(category_type=1)
+    serializer_class = CategorySerializer
+```
+
+#### filters.py
+
+```python
+import django_filters
+from django.db.models import Q
+from .models import Goods
+
+
+class GoodsFilter(django_filters.rest_framework.FilterSet):
+    """
+    商品的过滤类
+    """
+    # 对商品进行最大值和最小值的行为
+    pricemin = django_filters.NumberFilter(name='shop_price', lookup_expr='gte')
+    pricemax = django_filters.NumberFilter(name='shop_price', lookup_expr='lte')
+    top_category = django_filters.NumberFilter(method='top_category_filter')
+
+    def top_category_filter(self, queryset, name, value):
+        # 查找第一类别下面的商品
+        # queryset, name, value
+        queryset = queryset.filter(Q(category_id=value)|Q(category__parent_category_id=value)|Q(category__parent_category__parent_category_id=value))
+        return queryset
+    
+    class Meta:
+        model = Goods
+        fields = ['pricemin', 'pricemax']
+```
+
