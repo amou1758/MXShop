@@ -4,11 +4,12 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework import viewsets
 from rest_framework import filters
 # 使用 DRF 的 filters
-from goods.models import Goods
-from .serializers import GoodsSerializer
-# 导入过滤器模块
+from goods.models import Goods, GoodsCategory
 from django_filters.rest_framework import DjangoFilterBackend
 from .filter import GoodsFilter
+
+from .serializers import GoodsSerializer, CategorySerializer
+# 导入过滤器模块
 
 class GoodsPagination(PageNumberPagination):
     page_size = 10
@@ -17,7 +18,7 @@ class GoodsPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class GoodsListViewSet(mixins.ListModelMixin,  viewsets.GenericViewSet):
+class GoodsListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     """
     商品列表页, 分页, 搜索, 过滤, 排序
     """
@@ -34,3 +35,13 @@ class GoodsListViewSet(mixins.ListModelMixin,  viewsets.GenericViewSet):
     # = 表示精确搜索, 使用方法同上
     ordering_fields = ('sold_num', 'add_time')
     # 指定排序的字段
+    
+    
+class CategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    """
+    list:
+        商品分类列表数据
+    """
+    # 只需要在类视图中继承 mixins.RetrieveModelMixin  就可以在url中根据pk 取出具体某个数据
+    queryset = GoodsCategory.objects.filter()
+    serializer_class = CategorySerializer

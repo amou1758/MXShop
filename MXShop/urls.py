@@ -23,13 +23,16 @@ from rest_framework.documentation import include_docs_urls
 from rest_framework.routers import DefaultRouter
 
 # 导入视图类
-from goods.views import GoodsListViewSet
+from goods.views import GoodsListViewSet, CategoryViewSet
 
 
 # 配置 goods 的 url
 router = DefaultRouter()
-router.register(r'goods', GoodsListViewSet, base_name='')
-# 添加 base_name = ''
+router.register(r'goods', GoodsListViewSet, base_name='goods')
+# 添加 base_name = 'goods'
+
+# 配置 category 的 url
+router.register(r'categorys', CategoryViewSet, base_name='categorys')
 
 
 urlpatterns = [
@@ -37,6 +40,8 @@ urlpatterns = [
     url(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
     # 商品列表页 接口
     url(r'^', include(router.urls)),
+    # 获取具体的某个商品 根据商品的 pk
+    # url(r'(?P<pk>[0-9]+)/$', ),
     # 生成 DRF 自动文档的配置
     url(r'^docs/', include_docs_urls(title='慕学生鲜')),
     # 登陆 DRF 的 URL

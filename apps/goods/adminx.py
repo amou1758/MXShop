@@ -22,8 +22,8 @@ class GoodsAdmin(object):
 
 
 class GoodsCategoryAdmin(object):
-    list_display = ["name", "category_type", "category_category", "add_time"]
-    list_filter = ["category_type", "category_category", "name"]
+    list_display = ["name", "category_type", "parent_category", "add_time"]
+    list_filter = ["category_type", "parent_category", "name"]
     search_fields = ['name', ]
 
 

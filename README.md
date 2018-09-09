@@ -2071,6 +2071,127 @@ http://127.0.0.1:8000/goods/?ordering=-sold_num
 
 
 
-### 9. 总结:
+### 9. 总结: [传送门](https://www.bilibili.com/video/av30195311/?p=31)
 
-#### **商品列表页, 分页, 搜索, 过滤, 排序**
+#### **商品列表页, 分页, 搜索, 过滤, 排序的完成**
+
+
+
+## 第四章: 商品类别数据和vue展示:
+
+
+
+### 1. 商品类别数据接口: [传送门](https://www.bilibili.com/video/av30195311/?p=32)
+
+#### 类别的分级显示:
+
+serializers.py
+
+```python
+from rest_framework import serializers
+from goods.models import Goods, GoodsCategory
+
+
+
+class CategorySerializer3(serializers.ModelSerializer):
+    """目的:  取出该分类的子类"""
+    class Meta:
+        model = GoodsCategory
+        fields = "__all__"
+
+
+class CategorySerializer2(serializers.ModelSerializer):
+    sub_cat = CategorySerializer3(many=True)
+    """目的:  取出该分类的子类"""
+    class Meta:
+        model = GoodsCategory
+        fields = "__all__"
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    sub_cat = CategorySerializer2(many=True)
+    # many=True 表示可能会有多个字段
+    class Meta:
+        model = GoodsCategory
+        fields = "__all__"
+
+
+class GoodsSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+    # 对GoodsCategorySerializer 进行实例化, 也就是说将我们的外键表, 进行序列化之后, 引入进来进行实例化之后, 就可以当作我们的外键使用了
+    
+    class Meta:
+        model = Goods
+        fields = '__all__'
+```
+
+#### DRF 接口处 获取某个具体的信息(获取pk为1的商品)
+
+**只需要在类视图函数(ViewSet)中继承**
+
+views.py
+
+```python
+from rest_framework import generics, mixins
+from rest_framework.pagination import PageNumberPagination
+# 重构我们的 分页功能
+from rest_framework import viewsets
+from rest_framework import filters
+# 使用 DRF 的 filters
+from goods.models import Goods, GoodsCategory
+from django_filters.rest_framework import DjangoFilterBackend
+from .filter import GoodsFilter
+
+from .serializers import GoodsSerializer, CategorySerializer
+# 导入过滤器模块
+
+class GoodsPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    page_query_param = 'p'
+    max_page_size = 100
+
+# =========================================================================
+class GoodsListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+# 只需要在类视图中继承 mixins.RetrieveModelMixin  就可以在url中根据pk 取出具体某个数据
+# =========================================================================
+    """
+    商品列表页, 分页, 搜索, 过滤, 排序
+    """
+    queryset = Goods.objects.all()
+    serializer_class = GoodsSerializer
+    pagination_class = GoodsPagination
+    # 指定过滤函数
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    # 指定 DRF 中的 SearchFilter, 进行字段的搜索
+    # 指定 DRF 中的 OrderingFilter 进行字段的排序
+    filter_class = GoodsFilter
+    search_fields = ('^name', 'goods_brief', 'goods_desc')
+    # 进行了三个字段的配置, 但是 ^ 表示, 必须存在 name 字段以你搜索的内容开头的
+    # = 表示精确搜索, 使用方法同上
+    ordering_fields = ('sold_num', 'add_time')
+    # 指定排序的字段
+    
+# ========================================================================= 
+class CategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+# 只需要在类视图中继承 mixins.RetrieveModelMixin  就可以在url中根据pk 取出具体某个数据
+# =========================================================================
+    """
+    list:
+        商品分类列表数据
+    """
+    # 只需要在类视图中继承 mixins.RetrieveModelMixin  就可以在url中根据pk 取出具体某个数据
+    queryset = GoodsCategory.objects.filter()
+    serializer_class = CategorySerializer
+```
+
+**效果展示:**
+
+![1536510984030](C:\Users\Administrator\AppData\Local\Temp\1536510984030.png)
+
+**url展示:**
+
+```python
+http://127.0.0.1:8000/goods/1/
+```
+
