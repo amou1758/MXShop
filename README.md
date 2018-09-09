@@ -1681,14 +1681,14 @@ class GoodsListViewSet(mixins.ListModelMixin,  viewsets.GenericViewSet):
 
 ### 7. DRF 的 APIView, GenericView, ViewSet 和 router 的原理分析: [传送门](https://www.bilibili.com/video/av30195311/?p=27)
 
-理清思路: 继承关系
+#### 理清思路: 继承关系
 
 - GenericViewSet(viewset)  - DRF
   - GenericAPIView                   - DRF
     - APIView                                  - DRF
       - View                                          - Django
 
-- mixin
+- mixin 
   - CreateModelMixin
   - ListModelMixin
     - 将 get 和 list 链接起来 
@@ -1700,5 +1700,377 @@ class GoodsListViewSet(mixins.ListModelMixin,  viewsets.GenericViewSet):
 
 
 
+#### DRF的 Request 和 Response:
+
+都是基于 Django 的基础进行封装的
+
+- Request parsing 模块
+  - ##### .data:
+
+    - 将传递过来的数据 进行解析 request.data
+    - 包括所有文件的内容(文件和非文件的内容)
+
+  - query_params
+
+    - 解析我们的 get 请求过来的数据
+
+  - .parsers
+
+    - json 字符串 等数据, 进行解析(可以解析更熟类型的额数据)
+    - 可以解析各种 客户端发来的数据(电脑, 手机等)
+
+  - .user
+
+    - 获取到我们的用户
+
+  - .auth
+
+- Responses 模块
+
+  - 根据前端传递过来的要求, 进行导航
+  - .data
+    - 进行相应的内容
+  - status
+    - 返回的状态码
+  - template_name
+    - 进行渲染的模版
+  - headers
+    - 相应的头部
+
+### 8. DRF 的过滤功能
+
+项目的 urls.py
+
+当配置url的时候, 如果不添加 base_name = ‘’ 会报错.
+
+```python
+# 配置 goods 的 url
+router = DefaultRouter()
+router.register(r'goods', GoodsListViewSet, base_name='')
+```
+
+报错信息如下:
+
+```python
+AssertionError: `base_name` argument not specified, and could not automatically determine the name from the viewset, as it does not have a `.queryset` attribute.
+```
 
 
+
+```python
+from django.conf.urls import url, include
+import xadmin
+
+# 设计静态文件的访问url
+from MXShop.settings import MEDIA_ROOT
+from django.views.static import serve
+from rest_framework.documentation import include_docs_urls
+from rest_framework.routers import DefaultRouter
+
+# 导入视图类
+from goods.views import GoodsListViewSet
+
+
+# 配置 goods 的 url
+router = DefaultRouter()
+router.register(r'goods', GoodsListViewSet, base_name='')
+
+
+urlpatterns = [
+    url(r'^xadmin/', xadmin.site.urls),
+    url(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
+    # 商品列表页 接口
+    url(r'^', include(router.urls)),
+    # 生成 DRF 自动文档的配置
+    url(r'^docs/', include_docs_urls(title='慕学生鲜')),
+    # 登陆 DRF 的 URL
+    url(r'^api-auth/', include('rest_framework.urls')),
+]
+
+```
+
+#### 然后我们使用 API Gulde:
+
+
+
+在 settings.py 文件中注册应用
+
+```python
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    
+    'DjangoUeditor',
+    
+    'user.apps.UserConfig',
+    'goods.apps.GoodsConfig',
+    'trade.apps.TradeConfig',
+    'user_operation.apps.UserOperationConfig',
+    'crispy_forms',
+    'xadmin',
+    
+    'rest_framework',
+    
+    'django_filters'
+]
+```
+
+在 goods_app 的 views 试图函数中  使用:
+
+```python
+from rest_framework import generics, mixins
+from rest_framework.pagination import PageNumberPagination
+# 重构我们的 分页功能
+from rest_framework import viewsets
+
+from goods.models import Goods
+from .serializers import GoodsSerializer
+# 导入过滤器模块
+from django_filters.rest_framework import DjangoFilterBackend
+
+class GoodsPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    page_query_param = 'p'
+    max_page_size = 100
+
+
+class GoodsListViewSet(mixins.ListModelMixin,  viewsets.GenericViewSet):
+    """
+    商品列表页
+    """
+    queryset = Goods.objects.all()
+    serializer_class = GoodsSerializer
+    pagination_class = GoodsPagination
+    # 指定过滤函数
+    filter_backends = (DjangoFilterBackend,)
+    # 指定过滤字段
+    filter_fields = ('shop_price', 'name')
+```
+
+##### 实现效果对比:
+
+**原始效果:**
+
+![1536495502593](C:\Users\Administrator\AppData\Local\Temp\1536495502593.png)
+
+过滤之后的效果:
+
+![1536495538976](C:\Users\Administrator\AppData\Local\Temp\1536495538976.png)
+
+![1536495556903](C:\Users\Administrator\AppData\Local\Temp\1536495556903.png)
+
+因为我们在视图函数中只指定了两个过滤字段, 所以只显示两个过滤字段.
+
+#### 使用 FieldsSet
+
+##### 首先在 goods_app 下 创建一个 filter.py 的文件
+
+文件内容如下:
+
+```python
+import django_filters
+# 先导入 django_filters 模块
+
+from .models import Goods
+# 导入自己的模型
+
+
+# 定义过滤类, 然后在试图函数 views.py 中指定他
+class GoodsFilter(django_filters.rest_framework.FilterSet):
+    """
+    商品的过滤类
+    """
+    # 对商品进行最大值和最小值的行为
+    price_min = django_filters.NumberFilter(name='shop_price', lookup_expr='gte')
+    price_max = django_filters.NumberFilter(name='shop_price', lookup_expr='lte')
+    # 上面为 自定义的过滤字段行为
+
+    class Meta:
+        model = Goods
+        # 指定模型
+        fields = ['price_min', 'price_max']
+        # 指定过滤字段
+```
+
+goods_app 的 views.py  文件
+
+```python
+from rest_framework import generics, mixins
+from rest_framework.pagination import PageNumberPagination
+# 重构我们的 分页功能
+from rest_framework import viewsets
+
+from goods.models import Goods
+from .serializers import GoodsSerializer
+# 导入过滤器模块
+from django_filters.rest_framework import DjangoFilterBackend
+from .filter import GoodsFilter
+
+class GoodsPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    page_query_param = 'p'
+    max_page_size = 100
+
+
+class GoodsListViewSet(mixins.ListModelMixin,  viewsets.GenericViewSet):
+    """
+    商品列表页
+    """
+    queryset = Goods.objects.all()
+    serializer_class = GoodsSerializer
+    pagination_class = GoodsPagination
+    # 指定过滤函数
+    filter_backends = (DjangoFilterBackend,)
+    # 指定字段的过滤类, GoodsFilter  我们自己定义的过滤器类
+    filter_class = GoodsFilter
+```
+
+![1536496861840](C:\Users\Administrator\AppData\Local\Temp\1536496861840.png)
+
+**我们的过滤器字段的URL 对前端很友好:  如下**
+
+```python
+http://127.0.0.1:8000/goods/?price_min=100&price_max=200
+```
+
+#### **进行字段的模糊查询:**
+
+```python
+import django_filters
+
+from .models import Goods
+
+
+class GoodsFilter(django_filters.rest_framework.FilterSet):
+    """
+    商品的过滤类
+    """
+    # 对商品进行最大值和最小值的行为
+    price_min = django_filters.NumberFilter(name='shop_price', lookup_expr='gte')
+    price_max = django_filters.NumberFilter(name='shop_price', lookup_expr='lte')
+    name = django_filters.CharFilter(name='name', lookup_expr='icontains')
+    # 关于字符串的模糊查询, name='name' 指定字段 lookup_expr='icontains',
+    # contaions: 区分大小写
+    # icontains: 不区分大小写
+
+    class Meta:
+        model = Goods
+        fields = ['price_min', 'price_max', 'name']
+```
+
+#### 使用 DRF 的搜索功能:
+
+```python
+from rest_framework import generics, mixins
+from rest_framework.pagination import PageNumberPagination
+# 重构我们的 分页功能
+from rest_framework import viewsets
+# ==========================================================
+from rest_framework import filters
+# 使用 DRF 的 filters
+# ==========================================================
+from goods.models import Goods
+from .serializers import GoodsSerializer
+# 导入过滤器模块
+from django_filters.rest_framework import DjangoFilterBackend
+from .filter import GoodsFilter
+
+class GoodsPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    page_query_param = 'p'
+    max_page_size = 100
+
+
+class GoodsListViewSet(mixins.ListModelMixin,  viewsets.GenericViewSet):
+    """
+    商品列表页
+    """
+    queryset = Goods.objects.all()
+    serializer_class = GoodsSerializer
+    pagination_class = GoodsPagination
+    # ==========================================================
+    # 指定过滤函数
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    # 指定 DRF 中的 SearchFilter, 进行字段的搜索
+    filter_class = GoodsFilter
+    search_fields = ('name', 'goods_brief', 'goods_desc')
+    # 指定搜索的字段, 统统进行关键字搜索, 可以指定多个字段
+    # ==========================================================
+```
+
+**实现效果:**
+
+![1536499444777](C:\Users\Administrator\AppData\Local\Temp\1536499444777.png)
+
+
+
+#### 使用 DRF 的排序功能:
+
+view.py
+
+```python
+from rest_framework import generics, mixins
+from rest_framework.pagination import PageNumberPagination
+# 重构我们的 分页功能
+from rest_framework import viewsets
+from rest_framework import filters
+# 使用 DRF 的 filters
+from goods.models import Goods
+from .serializers import GoodsSerializer
+# 导入过滤器模块
+from django_filters.rest_framework import DjangoFilterBackend
+from .filter import GoodsFilter
+
+class GoodsPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    page_query_param = 'p'
+    max_page_size = 100
+
+
+class GoodsListViewSet(mixins.ListModelMixin,  viewsets.GenericViewSet):
+    """
+    商品列表页
+    """
+    queryset = Goods.objects.all()
+    serializer_class = GoodsSerializer
+    pagination_class = GoodsPagination
+    # ==========================================================
+    # 指定过滤函数
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    # 指定 DRF 中的 SearchFilter, 进行字段的搜索
+    # 指定 DRF 中的 OrderingFilter 进行字段的排序
+    # ==========================================================
+    filter_class = GoodsFilter
+    search_fields = ('^name', 'goods_brief', 'goods_desc')
+    # 进行了三个字段的配置, 但是 ^ 表示, 必须存在 name 字段以你搜索的内容开头的
+    # = 表示精确搜索, 使用方法同上
+    # ==========================================================
+    ordering_fields = ('sold_num', 'add_time')
+    # 指定排序的字段
+    # ==========================================================
+```
+
+**实现效果:**
+
+![1536500268669](C:\Users\Administrator\AppData\Local\Temp\1536500268669.png)
+
+**url 参数对前端很友好  如下:**
+
+```python
+http://127.0.0.1:8000/goods/?ordering=-sold_num
+```
+
+
+
+### 9. 总结:
+
+#### **商品列表页, 分页, 搜索, 过滤, 排序**
