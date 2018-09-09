@@ -20,16 +20,22 @@ import xadmin
 from MXShop.settings import MEDIA_ROOT
 from django.views.static import serve
 from rest_framework.documentation import include_docs_urls
-
+from rest_framework.routers import DefaultRouter
 
 # 导入视图类
-from goods.views import GoodsListView
+from goods.views import GoodsListViewSet
+
+
+# 配置 goods 的 url
+router = DefaultRouter()
+router.register(r'goods', GoodsListViewSet)
+
 
 urlpatterns = [
     url(r'^xadmin/', xadmin.site.urls),
     url(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
     # 商品列表页 接口
-    url(r'^goods/$', GoodsListView.as_view(), name='goods-list'),
+    url(r'^', include(router.urls)),
     # 生成 DRF 自动文档的配置
     url(r'^docs/', include_docs_urls(title='慕学生鲜')),
     # 登陆 DRF 的 URL
