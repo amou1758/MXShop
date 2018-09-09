@@ -1447,7 +1447,7 @@ class GoodsListView(generics.ListAPIView):
 
 
 
-### 6. viewsets 和 router 完成商品列表页:
+### 6. viewsets 和 router 完成商品列表页: [传送门](https://www.bilibili.com/video/av30195311/?p=26)
 
 viewset 提供的方法:
 
@@ -1676,4 +1676,29 @@ class GoodsListViewSet(mixins.ListModelMixin,  viewsets.GenericViewSet):
     pagination_class = GoodsPagination
 
 ```
+
+
+
+### 7. DRF 的 APIView, GenericView, ViewSet 和 router 的原理分析: [传送门](https://www.bilibili.com/video/av30195311/?p=27)
+
+理清思路: 继承关系
+
+- GenericViewSet(viewset)  - DRF
+  - GenericAPIView                   - DRF
+    - APIView                                  - DRF
+      - View                                          - Django
+
+- mixin
+  - CreateModelMixin
+  - ListModelMixin
+    - 将 get 和 list 链接起来 
+  - UpdateModelMixin
+    - 部分更新还是全部更新?
+  - DestoryModelMixin
+    - delete 方法
+  - RetrieveModelMixin
+
+
+
+
 
