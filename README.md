@@ -2348,3 +2348,6 @@ class GoodsFilter(django_filters.rest_framework.FilterSet):
         fields = ['pricemin', 'pricemax']
 ```
 
+### 4. vue 的商品搜索功能: [传送门](https://www.bilibili.com/video/av30195311/?p=35)
+
+**第四章 OVER**
