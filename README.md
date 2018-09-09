@@ -2195,3 +2195,73 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
 http://127.0.0.1:8000/goods/1/
 ```
 
+
+
+### 2.  vue 展示商品分类数据: [传送门](https://www.bilibili.com/video/av30195311/?p=34)
+
+#### 跨域访问:
+
+![1536512538314](C:\Users\Administrator\AppData\Local\Temp\1536512538314.png)
+
+#### Django 设置跨域访问
+
+1. 安装 django-cors-headers
+
+2. ```python
+   pip install django-cors-headers
+   ```
+
+   做一些相关的配置
+
+   1. 注册该应用, 
+
+   2. ```python
+      
+      INSTALLED_APPS = [
+          'django.contrib.admin',
+          'django.contrib.auth',
+          'django.contrib.contenttypes',
+          'django.contrib.sessions',
+          'django.contrib.messages',
+          'django.contrib.staticfiles',
+          
+          'DjangoUeditor',
+          
+          'user.apps.UserConfig',
+          'goods.apps.GoodsConfig',
+          'trade.apps.TradeConfig',
+          'user_operation.apps.UserOperationConfig',
+          'crispy_forms',
+          'xadmin',
+          
+          'rest_framework',
+          
+          'django_filters',
+          # ==================
+          'corsheaders'
+          # ==================
+      ]
+      
+      ```
+
+      加入 中间件 MIDDLEWARE:
+
+      **放在 CSRF 中间件之前**
+
+      ```python
+      MIDDLEWARE = [
+          'corsheaders.middleware.CorsMiddleware',
+          'django.middleware.common.CommonMiddleware',
+          # =======================================
+          'django.middleware.security.SecurityMiddleware',
+          'django.contrib.sessions.middleware.SessionMiddleware',
+          'django.middleware.common.CommonMiddleware',
+          'django.middleware.csrf.CsrfViewMiddleware',
+          'django.contrib.auth.middleware.AuthenticationMiddleware',
+          'django.contrib.messages.middleware.MessageMiddleware',
+          'django.middleware.clickjacking.XFrameOptionsMiddleware',
+      ]
+      # =======================================
+      CORS_ORIGIN_ALLOW_ALL = True
+      # 设置所有主机皆可访问
+      ```
